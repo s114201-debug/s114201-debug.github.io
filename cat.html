@@ -1,41 +1,83 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>點一下出現貓咪</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 80px;
-        }
-        #cat {
-            width: 300px;
-            display: none; /* 一開始不顯示 */
-            margin-top: 20px;
-        }
-        button {
-            font-size: 20px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>點一下會出現貓咪</title>
+<style>
+:root{--bg:#f6f8ff;--card:#fff;--accent:#7c5cff}
+html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;background:linear-gradient(180deg,var(--bg),#e9eefc);}
+.app{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;gap:16px}
+.card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 6px 30px rgba(20,30,80,0.08);max-width:920px;width:100%;text-align:center}
+h1{margin:0 0 6px 0;font-size:20px;color:#13224a}
+p{margin:0 0 12px 0;color:#445;}
+
+
+.big-btn{appearance:none;border:0;padding:14px 20px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#5fa0ff);color:#fff;font-weight:600;box-shadow:0 8px 20px rgba(124,92,255,0.18);cursor:pointer;font-size:16px}
+.hint{font-size:13px;color:#6b7280}
+
+
+/* 貓咪樣式 */
+.cat{position:absolute;width:120px;height:120px;transform-origin:center center;pointer-events:none;transition:transform .12s ease}
+.cat svg{width:100%;height:100%;display:block}
+
+
+/* 進場動畫 */
+@keyframes popUp {
+0% { transform: translateY(40px) scale(.6) rotate(-10deg); opacity:0 }
+60% { transform: translateY(-6px) scale(1.08) rotate(4deg); opacity:1 }
+100% { transform: translateY(0) scale(1) rotate(0) }
+}
+
+
+/* 飄上去並消失 */
+@keyframes floatUp {
+0% { transform: translateY(0) rotate(0); opacity:1 }
+100% { transform: translateY(-140px) rotate(8deg); opacity:0 }
+}
+
+
+.cat.enter{animation:popUp .45s ease forwards}
+.cat.leave{animation:floatUp 1.6s ease forwards}
+
+
+/* 小尾巴動 */
+.tail{transform-origin:12px 8px}
+.tail.wiggle{animation:wiggle .9s ease-in-out infinite}
+@keyframes wiggle{0%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}100%{transform:rotate(-8deg)}}
+
+
+/* footer */
+footer{font-size:12px;color:#718096;margin-top:14px}
+
+
+/* 小螢幕調整 */
+@media (max-width:480px){.cat{width:86px;height:86px}}
+</style>
 </head>
 <body>
+<div class="app">
+<div class="card">
+<h1>點一下 — 出現一隻貓咪 🐱</h1>
+<p>點按畫面任何地方或按下面的按鈕，會跳出一隻可愛的小貓。試試看！</p>
+<button id="spawnBtn" class="big-btn">點我出貓咪</button>
+<p class="hint">（點擊畫面可以在那個位置生成貓咪；連點可以產生多隻）</p>
+<footer>Tip: 按住 Shift 再點擊，貓咪會慢慢飄得更高。</footer>
+</div>
+</div>
 
-    <h1>點一下按鈕，讓貓咪出現！🐱</h1>
-    <button onclick="showCat()">出現貓咪！</button>
 
-    <!-- 你也可以改成自己的圖片網址 -->
-    <img id="cat" src="https://placekitten.com/400/300" alt="可愛的貓咪">
-
-    <script>
-        function showCat() {
-            const cat = document.getElementById("cat");
-            cat.style.display = "block";
-        }
-    </script>
-
-</body>
+<script>
+// 貓咪 SVG 函式 — 回傳 DOM 元素
+function createCatElement(){
+const wrapper = document.createElement('div');
+wrapper.className = 'cat enter';
+wrapper.innerHTML = `
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="g1" x1="0" x2="1">
+<stop offset="0%" stop-color="#fff" />
+<stop offset="100%" stop-color="#f6f6fb" />
+</linearGradient>
+</defs>
 </html>

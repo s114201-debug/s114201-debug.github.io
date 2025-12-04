@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <title>GitHub 點一下出現貓咪</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #f7f7fa;
+      cursor: pointer;
+    }
+    .cat {
+      position: absolute;
+      width: 100px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  const catBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABG0lEQVR4Ae3XsW3CMBBG4btWzi10BGSAdoo6gWQBaIj++ImQxMAR1dQc5sKXc5teLoI0lp4rWuH++uV/7d1DEEAIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCF0z3X8Wyv1s/o4F9dz9t7VDa9hfvsI3orAFz2uVH54camzatoDtrENcGukdxbYF9bBltAuFViZAfDdcQa1Bu/7uWGINuD/7++PK5EONosFVJeFt3PcTJS3BM4D26qcKoy0CZZ+j9RnBbTK1ZBOqVakiobP6KyHR+Y6z3Y0JVpaz6RtZpmjHtkobaN6D+PfYZ7R6puj949iFDUZIr05o2IaNbS1Ry6j3Tz7kRXKuX3sI5Gucs5cjox96D65gis6pZeRAAAAAElFTkSuQmCC";
+
+  document.addEventListener("click", (e) => {
+    const img = document.createElement("img");
+    img.src = catBase64;
+    img.className = "cat";
+    img.style.left = e.clientX + "px";
+    img.style.top = e.clientY + "px";
+    document.body.appendChild(img);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>點一下出現貓咪</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+        }
+        #cat {
+            width: 300px;
+            display: none; /* 一開始不顯示 */
+            margin-top: 20px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>點一下按鈕，讓貓咪出現！🐱</h1>
+    <button onclick="showCat()">出現貓咪！</button>
+
+    <!-- 你也可以改成自己的圖片網址 -->
+    <img id="cat" src="https://placekitten.com/400/300" alt="可愛的貓咪">
+
+    <script>
+        function showCat() {
+            const cat = document.getElementById("cat");
+            cat.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>

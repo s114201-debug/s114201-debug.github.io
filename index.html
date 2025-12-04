@@ -12,16 +12,17 @@
     }
     .cat {
       position: absolute;
-      width: 100px;
+      width: 120px;
       transform: translate(-50%, -50%);
       pointer-events: none;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
 <script>
-  const catBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABG0lEQVR4Ae3XsW3CMBBG4btWzi10BGSAdoo6gWQBaIj++ImQxMAR1dQc5sKXc5teLoI0lp4rWuH++uV/7d1DEEAIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCF0z3X8Wyv1s/o4F9dz9t7VDa9hfvsI3orAFz2uVH54camzatoDtrENcGukdxbYF9bBltAuFViZAfDdcQa1Bu/7uWGINuD/7++PK5EONosFVJeFt3PcTJS3BM4D26qcKoy0CZZ+j9RnBbTK1ZBOqVakiobP6KyHR+Y6z3Y0JVpaz6RtZpmjHtkobaN6D+PfYZ7R6puj949iFDUZIr05o2IaNbS1Ry6j3Tz7kRXKuX3sI5Gucs5cjox96D65gis6pZeRAAAAAElFTkSuQmCC";
+  const catBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAAsTAAALEwEAmpwYAAACMklEQVR4nO3bPW7TQBiG4edJqE4xBE6QglNMQpQwAUkwClHEFDMEokoqQgoNqG4tW7HGnPpHZ4GpP++2TbHh8OJyfnPA/DAt6qKvqoq+qCr6qKvqoq+qCr6qKvqoq+qCr6qKvpA3w34M47jOH4rXf8+j0ej0ej0eh+H4bjcbjcZjUZjUZjUZh+P4bjcbjaZrNZrNZrNZh+P4bjcLjdbjWazWazWafz+fz+fz+fz+fz+fz+fjcDiO47juO4zh+Px+P8/n8/n8/n8/n8/n8/n8/n8/n8n0ej0ej0ej3HcRx3Hcdx3EcR/H4/H4/H4/H4/H4982azWazWazWazWaz2fz+fz+fz+fz+fz2e12u12u12u12u12WzWazWazWazWazWaz2fz+fz+fz+fz+fz2e12u12u12u12u12azWazWazWazWaz2fz+fz+fz+fz+fz2WzWazWazWazWazWaz2fz+fz+fz+fz+fz2Wy2Wy2Wy2Wy2Wy22yzWazWazWazWazWaz2fz+fz+fz+fz+fz2Wy2Wy2Wy2Wy2Wy22yzWazWazWazWazWaz2fz+fz+fz+fz+fz2Wy2Wy2Wy2Wy2Wy22yzWazWazWazWazWazz9B8DIcBxHEcRx3Hcdx3HcRxHEfR6PR6PR6PR6PR6PR6PT6fz+fz+fz+fz+fz+fz+fz+fz+f7/Uv8AGre6EiUF9ngAAAABJRU5ErkJggg==";
 
   document.addEventListener("click", (e) => {
     const img = document.createElement("img");

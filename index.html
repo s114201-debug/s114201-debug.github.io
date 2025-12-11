@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>點一下出現貓咪</title>
+<title>超簡易版：一定會出現貓咪</title>
 <style>
 body {
 margin: 0;
@@ -24,19 +24,15 @@ pointer-events: none;
 
 
 <script>
-// 使用 base64 內嵌圖片，不用連到網路 → 100% 能顯示
 const cats = [
-// 可愛橘貓
 "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Ccircle cx='75' cy='75' r='55' fill='%23ffb347'/%3E%3Ccircle cx='55' cy='65' r='12' fill='white'/%3E%3Ccircle cx='95' cy='65' r='12' fill='white'/%3E%3Ccircle cx='55' cy='65' r='6' fill='black'/%3E%3Ccircle cx='95' cy='65' r='6' fill='black'/%3E%3Cpolygon points='75,90 63,105 87,105' fill='pink'/%3E%3Cpath d='M40 55 L60 45 L55 70' fill='%23ffb347'/%3E%3Cpath d='M110 55 L90 45 L95 70' fill='%23ffb347'/%3E%3C/svg%3E",
 
 
-// 白色胖貓
 "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cellipse cx='75' cy='85' rx='50' ry='40' fill='white' stroke='%23ccc' stroke-width='3'/%3E%3Ccircle cx='55' cy='70' r='10' fill='black'/%3E%3Ccircle cx='95' cy='70' r='10' fill='black'/%3E%3Cpolygon points='75,85 65,95 85,95' fill='pink'/%3E%3Cpath d='M40 60 L60 45 L55 70' fill='white'/%3E%3Cpath d='M110 60 L90 45 L95 70' fill='white'/%3E%3C/svg%3E",
 
 
-// 紫色可愛萌貓
 "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect x='25' y='25' width='100' height='100' rx='30' fill='%23d7b2ff'/%3E%3Ccircle cx='55' cy='65' r='10' fill='white'/%3E%3Ccircle cx='95' cy='65' r='10' fill='white'/%3E%3Ccircle cx='55' cy='65' r='5' fill='black'/%3E%3Ccircle cx='95' cy='65' r='5' fill='black'/%3E%3Cpolygon points='75,85 65,100 85,100' fill='pink'/%3E%3Cpath d='M30 50 L55 30 L50 60' fill='%23d7b2ff'/%3E%3Cpath d='M120 50 L95 30 L100 60' fill='%23d7b2ff'/%3E%3C/svg%3E"
-];base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABG0lEQVR4Ae3XsW3CMBBG4btWzi10BGSAdoo6gWQBaIj++ImQxMAR1dQc5sKXc5teLoI0lp4rWuH++uV/7d1DEEAIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCF0z3X8Wyv1s/o4F9dz9t7VDa9hfvsI3orAFz2uVH54camzatoDtrENcGukdxbYF9bBltAuFViZAfDdcQa1Bu/7uWGINuD/7++PK5EONosFVJeFt3PcTJS3BM4D26qcKoy0CZZ+j9RnBbTK1ZBOqVakiobP6KyHR+Y6z3Y0JVpaz6RtZpmjHtkobaN6D+PfYZ7R6puj949iFDUZIr05o2IaNbS1Ry6j3Tz7kRXKuX3sI5Gucs5cjox96D65gis6pZeRAAAAAElFTkSuQmCC";
+];
 
 
 document.addEventListener("click", (e) => {

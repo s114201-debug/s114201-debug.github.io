@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>重力貓咪測試版</title>
+<title>重力貓咪（可愛版）</title>
 <style>
 body {
     margin: 0;
@@ -15,47 +15,77 @@ body {
 <canvas id="world"></canvas>
 
 <script>
-// ------------- 基本畫布設定 -------------
+// ---------- 畫布 ----------
 const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let cats = []; // 所有貓咪物件
+// ---------- 貓咪列表 ----------
+let cats = [];
 
-// ------------- 生成貓咪（簡易圓形） -------------
+// ---------- 畫貓咪（canvas） ----------
+function drawCat(cat) {
+    const s = cat.size;
+
+    // 身體（圓形）
+    ctx.beginPath();
+    ctx.fillStyle = cat.color;
+    ctx.arc(cat.x, cat.y, s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 耳朵
+    ctx.beginPath();
+    ctx.moveTo(cat.x - s * 0.6, cat.y - s * 0.2);
+    ctx.lineTo(cat.x - s * 0.2, cat.y - s * 0.9);
+    ctx.lineTo(cat.x, cat.y - s * 0.2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(cat.x + s * 0.6, cat.y - s * 0.2);
+    ctx.lineTo(cat.x + s * 0.2, cat.y - s * 0.9);
+    ctx.lineTo(cat.x, cat.y - s * 0.2);
+    ctx.fill();
+
+    // 眼睛
+    ctx.beginPath();
+    ctx.fillStyle = "black";
+    ctx.arc(cat.x - s * 0.35, cat.y - s * 0.1, s * 0.15, 0, Math.PI * 2);
+    ctx.arc(cat.x + s * 0.35, cat.y - s * 0.1, s * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 鼻子
+    ctx.beginPath();
+    ctx.fillStyle = "pink";
+    ctx.arc(cat.x, cat.y + s * 0.1, s * 0.12, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// ---------- 生貓咪 ----------
 function spawnCat(x, y) {
     cats.push({
         x: x,
         y: y,
-        vx: (Math.random() - 0.5) * 2,
+        vx: (Math.random() - 0.5) * 3,
         vy: 0,
-        size: 40 + Math.random() * 20,
+        size: 25 + Math.random() * 20,
+        color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"][Math.floor(Math.random()*4)]
     });
 }
 
-// ------------- 繪製貓咪 -------------
-function drawCat(c) {
-    ctx.beginPath();
-    ctx.fillStyle = "#ffcc66";
-    ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-// ------------- 重力＋彈跳物理 -------------
+// ---------- 更新 ----------
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     cats.forEach(cat => {
-        // 重力
-        cat.vy += 0.4;
+        cat.vy += 0.4;       // 重力
         cat.y += cat.vy;
         cat.x += cat.vx;
 
-        // 碰到地板
+        // 地板彈跳
         if (cat.y + cat.size > canvas.height) {
             cat.y = canvas.height - cat.size;
-            cat.vy *= -0.6; // 彈性
+            cat.vy *= -0.6;
         }
 
         drawCat(cat);
@@ -66,7 +96,7 @@ function update() {
 
 update();
 
-// ------------- 點擊時生成貓咪 -------------
+// 點擊增加貓咪
 document.addEventListener("click", e => {
     spawnCat(e.clientX, e.clientY);
 });

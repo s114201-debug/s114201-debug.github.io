@@ -1,45 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>點一下出現貓咪</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            cursor: pointer;
-            background: #f5f5f5;
-        }
-        .cat {
-            position: absolute;
-            width: 150px;
-            pointer-events: none;
-        }
-    </style>
+<meta charset="utf-8" />
+<title>超簡易版：一定會出現貓咪</title>
+<style>
+body {
+margin: 0;
+height: 100vh;
+cursor: pointer;
+background: #f7f7fa;
+font-family: sans-serif;
+}
+.cat {
+position: absolute;
+width: 100px;
+transform: translate(-50%, -50%);
+user-select: none;
+pointer-events: none;
+}
+</style>
 </head>
 <body>
-<script>
-    const catSVG = `
-        <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>
-            <circle cx='75' cy='75' r='60' fill='orange'/>
-            <circle cx='50' cy='60' r='12' fill='white'/>
-            <circle cx='100' cy='60' r='12' fill='white'/>
-            <circle cx='50' cy='60' r='6' fill='black'/>
-            <circle cx='100' cy='60' r='6' fill='black'/>
-            <polygon points='75,85 62,100 88,100' fill='pink'/>
-            <polygon points='35,45 55,30 55,55' fill='orange'/>
-            <polygon points='115,45 95,30 95,55' fill='orange'/>
-        </svg>
-    `;
 
-    document.body.addEventListener("click", (e) => {
-        const img = document.createElement("img");
-        img.className = "cat";
-        img.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(catSVG);
-        img.style.left = (e.pageX - 75) + "px";
-        img.style.top  = (e.pageY - 75) + "px";
-        document.body.appendChild(img);
-    });
+
+<script>
+const cats = [
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABG0lEQVR4Ae3XsW3CMBBG4btWzi10BGSAdoo6gWQBaIj++ImQxMAR1dQc5sKXc5teLoI0lp4rWuH++uV/7d1DEEAIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCF0z3X8Wyv1s/o4F9dz9t7VDa9hfvsI3orAFz2uVH54camzatoDtrENcGukdxbYF9bBltAuFViZAfDdcQa1Bu/7uWGINuD/7++PK5EONosFVJeFt3PcTJS3BM4D26qcKoy0CZZ+j9RnBbTK1ZBOqVakiobP6KyHR+Y6z3Y0JVpaz6RtZpmjHtkobaN6D+PfYZ7R6puj949iFDUZIr05o2IaNbS1Ry6j3Tz7kRXKuX3sI5Gucs5cjox96D65gis6pZeRAAAAAElFTkSuQmCC",
+"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='60' cy='60' r='50' fill='orange'/%3E%3Ccircle cx='45' cy='50' r='10' fill='white'/%3E%3Ccircle cx='75' cy='50' r='10' fill='white'/%3E%3Ccircle cx='45' cy='50' r='5' fill='black'/%3E%3Ccircle cx='75' cy='50' r='5' fill='black'/%3E%3Cpolygon points='60,70 50,80 70,80' fill='pink'/%3E%3C/svg%3E",
+"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect x='20' y='20' width='80' height='80' rx='20' fill='%23c98aff'/%3E%3Ccircle cx='45' cy='55' r='8' fill='white'/%3E%3Ccircle cx='75' cy='55' r='8' fill='white'/%3E%3Ccircle cx='45' cy='55' r='4' fill='black'/%3E%3Ccircle cx='75' cy='55' r='4' fill='black'/%3E%3Cpolygon points='60,70 50,80 70,80' fill='pink'/%3E%3C/svg%3E"
+];base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABG0lEQVR4Ae3XsW3CMBBG4btWzi10BGSAdoo6gWQBaIj++ImQxMAR1dQc5sKXc5teLoI0lp4rWuH++uV/7d1DEEAIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCF0z3X8Wyv1s/o4F9dz9t7VDa9hfvsI3orAFz2uVH54camzatoDtrENcGukdxbYF9bBltAuFViZAfDdcQa1Bu/7uWGINuD/7++PK5EONosFVJeFt3PcTJS3BM4D26qcKoy0CZZ+j9RnBbTK1ZBOqVakiobP6KyHR+Y6z3Y0JVpaz6RtZpmjHtkobaN6D+PfYZ7R6puj949iFDUZIr05o2IaNbS1Ry6j3Tz7kRXKuX3sI5Gucs5cjox96D65gis6pZeRAAAAAElFTkSuQmCC";
+
+
+document.addEventListener("click", (e) => {
+const img = document.createElement("img");
+const randomCat = cats[Math.floor(Math.random() * cats.length)];
+img.src = randomCat;
+img.className = "cat";
+img.style.left = e.clientX + "px";
+img.style.top = e.clientY + "px";
+document.body.appendChild(img);
+});
 </script>
+
+
 </body>
 </html>

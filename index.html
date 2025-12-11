@@ -1,22 +1,75 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>貓咪重力</title>
+<meta charset="utf-8" />
+<title>重力貓咪測試版</title>
 <style>
-  body {
+body {
     margin: 0;
     overflow: hidden;
-    background: #f0f0f0;
-  }
-  canvas {
-    display: block;
-  }
+    background: #f7f7fa;
+}
 </style>
 </head>
 <body>
-<canvas id="catCanvas"></canvas>
-<script src="script.js"></script>
+<canvas id="world"></canvas>
+
+<script>
+// ------------- 基本畫布設定 -------------
+const canvas = document.getElementById("world");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let cats = []; // 所有貓咪物件
+
+// ------------- 生成貓咪（簡易圓形） -------------
+function spawnCat(x, y) {
+    cats.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: 0,
+        size: 40 + Math.random() * 20,
+    });
+}
+
+// ------------- 繪製貓咪 -------------
+function drawCat(c) {
+    ctx.beginPath();
+    ctx.fillStyle = "#ffcc66";
+    ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// ------------- 重力＋彈跳物理 -------------
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    cats.forEach(cat => {
+        // 重力
+        cat.vy += 0.4;
+        cat.y += cat.vy;
+        cat.x += cat.vx;
+
+        // 碰到地板
+        if (cat.y + cat.size > canvas.height) {
+            cat.y = canvas.height - cat.size;
+            cat.vy *= -0.6; // 彈性
+        }
+
+        drawCat(cat);
+    });
+
+    requestAnimationFrame(update);
+}
+
+update();
+
+// ------------- 點擊時生成貓咪 -------------
+document.addEventListener("click", e => {
+    spawnCat(e.clientX, e.clientY);
+});
+</script>
 </body>
 </html>

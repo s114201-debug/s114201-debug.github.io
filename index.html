@@ -35,7 +35,52 @@ const cats = [
 ];
 
 
+// 讓貓咪下落並彈跳的函式
+function applyGravity(cat) {
+let y = parseFloat(cat.style.top);
+let vy = 0; // 垂直速度
+const gravity = 0.6; // 重力加速度
+const bounce = 0.6; // 彈性係數
+const floor = window.innerHeight - 20; // 地板位置
+
+
+function fall() {
+vy += gravity;
+y += vy;
+
+
+// 碰到地板
+if (y >= floor) {
+y = floor;
+vy = -vy * bounce; // 反彈
+
+
+// 速度太小就停止動畫
+if (Math.abs(vy) < 1) return;
+}
+
+
+cat.style.top = y + "px";
+requestAnimationFrame(fall);
+}
+
+
+requestAnimationFrame(fall);
+}
+
+
 document.addEventListener("click", (e) => {
+const img = document.createElement("img");
+const randomCat = cats[Math.floor(Math.random() * cats.length)];
+img.src = randomCat;
+img.className = "cat";
+img.style.left = e.clientX + "px";
+img.style.top = e.clientY + "px";
+document.body.appendChild(img);
+
+
+applyGravity(img); // 加上重力動畫
+});("click", (e) => {
 const img = document.createElement("img");
 const randomCat = cats[Math.floor(Math.random() * cats.length)];
 img.src = randomCat;

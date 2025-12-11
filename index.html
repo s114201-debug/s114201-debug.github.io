@@ -1,121 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>Falling Cats</title>
-<style>
-    body { margin: 0; overflow: hidden; background: #fefefe; }
-    canvas { display: block; }
-</style>
+<meta charset="UTF-8">
+<title>測試：一定會看到貓</title>
 </head>
-<body>
-<canvas id="canvas"></canvas>
+<body style="margin:0; background:#fafafa;">
 
-<script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+<h1 style="text-align:center;">測試頁面：你應該要看到一隻貓</h1>
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/320px-Cat03.jpg"
+     style="display:block; margin:20px auto; width:200px;">
 
-// 這是內嵌的小貓圖片（base64）→ 不會失敗！
-const catImg = new Image();
-catImg.src =
-"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAY5JREFUaEPtmk1uwkAQhT+RgW0gm0gk2gl0gk0gm0gk7gk7okA0gk0gmUYnp1PrHjv2dn52Zk2m07+nT09r7yLwFJEGCI6LjE0joiF8hL6gKAG9xF0GCxgK3kW8B8DvOvgLwJ4x0uZIjzJ8Nvjg7jzXw7gHo+L4mCUC0Fbvz5WvZfUAMz21gqP4vMEE8gJwPqvVaqn8fiQ1ChqAUNqmqbTqdTgcDj8b/BX6vT6VSjUaDabTbbtGr1fmzAzCZTyWRSLJZPJPBPJ5HPo9Eo1Go2m3G63W4XCYVCqXyjxeLxeLwcikUgkUgk8lItVqtVpVKhUKpVJJKJBLJZFIpl8tFotFIpFIp9Nvt9sNlsFoPBMMwwDAMQxDEAwwDAMQxDEAz8B9wCy0Dxmy+dAAAAAElFTkSuQmCC";
+<p style="text-align:center;">
+如果你看到這隻貓，表示 GitHub Page 正常。<br>
+看到空白 → GitHub Page 設定錯誤。
+</p>
 
-const cats = [];
-const gravity = 0.5;
-const bounce = 0.6;
-
-function spawnCat(x, y) {
-    const size = 60 + Math.random() * 40; // 隨機大小
-    cats.push({
-        x: x,
-        y: y,
-        vx: (Math.random() - 0.5) * 5,
-        vy: -5,
-        size: size
-    });
-}
-
-// 滑鼠 → 掉貓
-canvas.addEventListener("mousedown", (e) => {
-    spawnCat(e.clientX, e.clientY);
-});
-
-// 空白鍵 → 掉貓
-window.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
-        spawnCat(canvas.width / 2, 50);
-    }
-});
-
-function update() {
-    for (let i = 0; i < cats.length; i++) {
-        let c = cats[i];
-
-        // 重力
-        c.vy += gravity;
-        c.x += c.vx;
-        c.y += c.vy;
-
-        // 左右牆
-        if (c.x < 0) { c.x = 0; c.vx *= -bounce; }
-        if (c.x + c.size > canvas.width) {
-            c.x = canvas.width - c.size;
-            c.vx *= -bounce;
-        }
-
-        // 地板反彈
-        if (c.y + c.size > canvas.height) {
-            c.y = canvas.height - c.size;
-            c.vy *= -bounce;
-            if (Math.abs(c.vy) < 1) c.vy = 0;
-        }
-
-        // 貓咪互相碰撞
-        for (let j = i + 1; j < cats.length; j++) {
-            let c2 = cats[j];
-            let dx = (c.x + c.size / 2) - (c2.x + c2.size / 2);
-            let dy = (c.y + c.size / 2) - (c2.y + c2.size / 2);
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            let minDist = (c.size + c2.size) / 2;
-
-            if (dist < minDist) {
-                let angle = Math.atan2(dy, dx);
-                let overlap = minDist - dist;
-
-                c.x += Math.cos(angle) * overlap / 2;
-                c.y += Math.sin(angle) * overlap / 2;
-                c2.x -= Math.cos(angle) * overlap / 2;
-                c2.y -= Math.sin(angle) * overlap / 2;
-
-                // 交換速度
-                let tx = c.vx;
-                let ty = c.vy;
-                c.vx = c2.vx * bounce;
-                c.vy = c2.vy * bounce;
-                c2.vx = tx * bounce;
-                c2.vy = ty * bounce;
-            }
-        }
-    }
-}
-
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let c of cats) {
-        ctx.drawImage(catImg, c.x, c.y, c.size, c.size);
-    }
-}
-
-function loop() {
-    update();
-    draw();
-    requestAnimationFrame(loop);
-}
-
-catImg.onload = loop;
-</script>
 </body>
 </html>

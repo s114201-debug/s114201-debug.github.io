@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Cat Drop Physics</title>
+<meta charset="UTF-8" />
+<title>Falling Cats</title>
 <style>
-    body { margin: 0; overflow: hidden; background: #fafafa; }
+    body { margin: 0; overflow: hidden; background: #fefefe; }
     canvas { display: block; }
 </style>
 </head>
@@ -14,94 +14,89 @@
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Cat image (確保一定能載入成功)
+// 這是內嵌的小貓圖片（base64）→ 不會失敗！
 const catImg = new Image();
-catImg.src = "https://i.imgur.com/4AiXzf8.png"; // 小橘貓透明貼圖
+catImg.src =
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAY5JREFUaEPtmk1uwkAQhT+RgW0gm0gk2gl0gk0gm0gk7gk7okA0gk0gmUYnp1PrHjv2dn52Zk2m07+nT09r7yLwFJEGCI6LjE0joiF8hL6gKAG9xF0GCxgK3kW8B8DvOvgLwJ4x0uZIjzJ8Nvjg7jzXw7gHo+L4mCUC0Fbvz5WvZfUAMz21gqP4vMEE8gJwPqvVaqn8fiQ1ChqAUNqmqbTqdTgcDj8b/BX6vT6VSjUaDabTbbtGr1fmzAzCZTyWRSLJZPJPBPJ5HPo9Eo1Go2m3G63W4XCYVCqXyjxeLxeLwcikUgkUgk8lItVqtVpVKhUKpVJJKJBLJZFIpl8tFotFIpFIp9Nvt9sNlsFoPBMMwwDAMQxDEAwwDAMQxDEAz8B9wCy0Dxmy+dAAAAAElFTkSuQmCC";
 
 const cats = [];
 const gravity = 0.5;
 const bounce = 0.6;
 
-// 產生一隻貓
 function spawnCat(x, y) {
-    const scale = Math.random() * 0.4 + 0.6; // 不同大小
+    const size = 60 + Math.random() * 40; // 隨機大小
     cats.push({
         x: x,
         y: y,
         vx: (Math.random() - 0.5) * 5,
-        vy: Math.random() * -5,
-        size: 80 * scale
+        vy: -5,
+        size: size
     });
 }
 
-// 滑鼠點擊產生貓
+// 滑鼠 → 掉貓
 canvas.addEventListener("mousedown", (e) => {
     spawnCat(e.clientX, e.clientY);
 });
 
-// 按空白鍵產生貓
+// 空白鍵 → 掉貓
 window.addEventListener("keydown", (e) => {
     if (e.code === "Space") {
-        spawnCat(canvas.width / 2, 50); // 從中上方掉
+        spawnCat(canvas.width / 2, 50);
     }
 });
 
 function update() {
     for (let i = 0; i < cats.length; i++) {
-        const c = cats[i];
+        let c = cats[i];
 
         // 重力
         c.vy += gravity;
         c.x += c.vx;
         c.y += c.vy;
 
-        // 撞牆
-        if (c.x < 0) {
-            c.x = 0;
-            c.vx *= -bounce;
-        }
+        // 左右牆
+        if (c.x < 0) { c.x = 0; c.vx *= -bounce; }
         if (c.x + c.size > canvas.width) {
             c.x = canvas.width - c.size;
             c.vx *= -bounce;
         }
 
-        // 撞地板
+        // 地板反彈
         if (c.y + c.size > canvas.height) {
             c.y = canvas.height - c.size;
             c.vy *= -bounce;
-
-            // 速度太小就停止彈跳
             if (Math.abs(c.vy) < 1) c.vy = 0;
         }
 
-        // 貓與貓互相碰撞
+        // 貓咪互相碰撞
         for (let j = i + 1; j < cats.length; j++) {
-            const c2 = cats[j];
-            const dx = (c.x + c.size / 2) - (c2.x + c2.size / 2);
-            const dy = (c.y + c.size / 2) - (c2.y + c2.size / 2);
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const minDist = (c.size + c2.size) / 2;
+            let c2 = cats[j];
+            let dx = (c.x + c.size / 2) - (c2.x + c2.size / 2);
+            let dy = (c.y + c.size / 2) - (c2.y + c2.size / 2);
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            let minDist = (c.size + c2.size) / 2;
 
             if (dist < minDist) {
-                // 簡單互相彈開
-                const angle = Math.atan2(dy, dx);
-                const overlap = minDist - dist;
+                let angle = Math.atan2(dy, dx);
+                let overlap = minDist - dist;
 
                 c.x += Math.cos(angle) * overlap / 2;
                 c.y += Math.sin(angle) * overlap / 2;
                 c2.x -= Math.cos(angle) * overlap / 2;
                 c2.y -= Math.sin(angle) * overlap / 2;
 
-                // 交換速度（簡化物理）
-                let tempVx = c.vx;
-                let tempVy = c.vy;
+                // 交換速度
+                let tx = c.vx;
+                let ty = c.vy;
                 c.vx = c2.vx * bounce;
                 c.vy = c2.vy * bounce;
-                c2.vx = tempVx * bounce;
-                c2.vy = tempVy * bounce;
+                c2.vx = tx * bounce;
+                c2.vy = ty * bounce;
             }
         }
     }
@@ -109,7 +104,7 @@ function update() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const c of cats) {
+    for (let c of cats) {
         ctx.drawImage(catImg, c.x, c.y, c.size, c.size);
     }
 }

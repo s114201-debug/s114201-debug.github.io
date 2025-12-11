@@ -1,51 +1,4 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="utf-8" />
-<title>超簡易版：一定會出現貓咪</title>
-<style>
-body {
-margin: 0;
-height: 100vh;
-cursor: pointer;
-background: #f7f7fa;
-font-family: sans-serif;
-}
-.cat {
-position: absolute;
-width: 100px;
-transform: translate(-50%, -50%);
-user-select: none;
-pointer-events: none;
-}
-</style>
-</head>
-<body>
-
-
-<script>
-const cats = [
-"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Ccircle cx='75' cy='75' r='55' fill='%23ffb347'/%3E%3Ccircle cx='55' cy='65' r='12' fill='white'/%3E%3Ccircle cx='95' cy='65' r='12' fill='white'/%3E%3Ccircle cx='55' cy='65' r='6' fill='black'/%3E%3Ccircle cx='95' cy='65' r='6' fill='black'/%3E%3Cpolygon points='75,90 63,105 87,105' fill='pink'/%3E%3Cpath d='M40 55 L60 45 L55 70' fill='%23ffb347'/%3E%3Cpath d='M110 55 L90 45 L95 70' fill='%23ffb347'/%3E%3C/svg%3E",
-
-
-"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cellipse cx='75' cy='85' rx='50' ry='40' fill='white' stroke='%23ccc' stroke-width='3'/%3E%3Ccircle cx='55' cy='70' r='10' fill='black'/%3E%3Ccircle cx='95' cy='70' r='10' fill='black'/%3E%3Cpolygon points='75,85 65,95 85,95' fill='pink'/%3E%3Cpath d='M40 60 L60 45 L55 70' fill='white'/%3E%3Cpath d='M110 60 L90 45 L95 70' fill='white'/%3E%3C/svg%3E",
-
-
-"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect x='25' y='25' width='100' height='100' rx='30' fill='%23d7b2ff'/%3E%3Ccircle cx='55' cy='65' r='10' fill='white'/%3E%3Ccircle cx='95' cy='65' r='10' fill='white'/%3E%3Ccircle cx='55' cy='65' r='5' fill='black'/%3E%3Ccircle cx='95' cy='65' r='5' fill='black'/%3E%3Cpolygon points='75,85 65,100 85,100' fill='pink'/%3E%3Cpath d='M30 50 L55 30 L50 60' fill='%23d7b2ff'/%3E%3Cpath d='M120 50 L95 30 L100 60' fill='%23d7b2ff'/%3E%3C/svg%3E"
-];
-
-
-// 讓貓咪下落並彈跳的函式
-function applyGravity(cat) {
-let y = parseFloat(cat.style.top);
-let vy = 0; // 垂直速度
-const gravity = 0.6; // 重力加速度
-const bounce = 0.6; // 彈性係數
-const floor = window.innerHeight - 20; // 地板位置
-
-
-function fall() {
-vy += gravity;
 y += vy;
 
 
@@ -88,6 +41,113 @@ img.className = "cat";
 img.style.left = e.clientX + "px";
 img.style.top = e.clientY + "px";
 document.body.appendChild(img);
+});
+// --- 全域陣列：存放所有貓咪物件 ---
+let catsOnScreen = [];
+
+
+function createCatElement(x, y, src) {
+const img = document.createElement("img");
+img.src = src;
+img.className = "cat";
+img.style.left = x + "px";
+img.style.top = y + "px";
+
+
+// 物理屬性
+return {
+el: img,
+x: x,
+y: y,
+vx: (Math.random() - 0.5) * 4, // 左右初速度
+vy: 0,
+width: 100,
+height: 100,
+grounded: false
+};
+}
+
+
+// --- 貓咪物理更新 ---
+function physicsLoop() {
+const gravity = 0.4;
+const floor = window.innerHeight - 20;
+
+
+for (let c of catsOnScreen) {
+// 加重力
+if (!c.grounded) c.vy += gravity;
+
+
+// 更新位置
+c.x += c.vx;
+c.y += c.vy;
+
+
+// --- 地板碰撞 ---
+if (c.y + c.height >= floor) {
+c.y = floor - c.height;
+c.vy *= -0.3; // 彈力
+if (Math.abs(c.vy) < 0.5) {
+c.vy = 0;
+c.grounded = true;
+}
+}
+
+
+// --- 與其他貓咪的碰撞 ---
+for (let other of catsOnScreen) {
+if (other === c) continue;
+
+
+// AABB 碰撞檢查
+if (
+c.x < other.x + other.width &&
+c.x + c.width > other.x &&
+c.y < other.y + other.height &&
+c.y + c.height > other.y
+) {
+// 水平分離
+if (c.x < other.x) {
+c.x -= 2;
+other.x += 2;
+} else {
+c.x += 2;
+other.x -= 2;
+}
+
+
+// 垂直堆疊
+if (c.y < other.y) {
+c.y = other.y - c.height;
+c.vy = 0;
+c.grounded = true;
+}
+}
+}
+
+
+// 更新 DOM
+c.el.style.left = c.x + "px";
+c.el.style.top = c.y + "px";
+}
+
+
+requestAnimationFrame(physicsLoop);
+}
+
+
+// 啟動物理循環
+requestAnimationFrame(physicsLoop);
+
+
+document.addEventListener("click", (e) => {
+const randomCat = cats[Math.floor(Math.random() * cats.length)];
+const newCat = createCatElement(e.clientX, e.clientY, randomCat);
+
+
+document.body.appendChild(newCat.el);
+catsOnScreen.push(newCat);
 });
 </script>
 

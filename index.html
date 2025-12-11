@@ -1,20 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<title>測試：一定會看到貓</title>
+<meta charset="utf-8" />
+<title>點一下會出現貓咪</title>
+<style>
+  body {
+    margin: 0;
+    background: #f7f7fa;
+    height: 100vh;
+    overflow: hidden;
+    cursor: pointer;
+    font-family: sans-serif;
+  }
+  .cat {
+    position: absolute;
+    width: 120px;
+    transform: translate(-50%, -50%);
+    user-select: none;
+    pointer-events: none;
+  }
+</style>
 </head>
-<body style="margin:0; background:#fafafa;">
+<body>
 
-<h1 style="text-align:center;">測試頁面：你應該要看到一隻貓</h1>
+<script>
+// --- 3 款簡單可愛的 SVG 貓 ---
+const cats = [
+  // 橘色圓貓
+  "data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
+    <circle cx='75' cy='75' r='55' fill='#ffb347' />\
+    <circle cx='55' cy='65' r='12' fill='white' />\
+    <circle cx='95' cy='65' r='12' fill='white' />\
+    <circle cx='55' cy='65' r='6' fill='black' />\
+    <circle cx='95' cy='65' r='6' fill='black' />\
+    <polygon points='75,90 63,105 87,105' fill='pink' />\
+  </svg>",
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/320px-Cat03.jpg"
-     style="display:block; margin:20px auto; width:200px;">
+  // 白色貓
+  "data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
+    <ellipse cx='75' cy='85' rx='50' ry='40' fill='white' stroke='#ccc' stroke-width='3' />\
+    <circle cx='55' cy='70' r='10' fill='black' />\
+    <circle cx='95' cy='70' r='10' fill='black' />\
+    <polygon points='75,85 65,95 85,95' fill='pink' />\
+  </svg>",
 
-<p style="text-align:center;">
-如果你看到這隻貓，表示 GitHub Page 正常。<br>
-看到空白 → GitHub Page 設定錯誤。
-</p>
+  // 紫色方貓
+  "data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
+    <rect x='25' y='25' width='100' height='100' rx='30' fill='#d7b2ff' />\
+    <circle cx='55' cy='65' r='10' fill='white' />\
+    <circle cx='95' cy='65' r='10' fill='white' />\
+    <circle cx='55' cy='65' r='5' fill='black' />\
+    <circle cx='95' cy='65' r='5' fill='black' />\
+    <polygon points='75,85 65,100 85,100' fill='pink' />\
+  </svg>"
+];
+
+// --- 建立貓咪 ---
+function spawnCat(x, y) {
+  const img = document.createElement("img");
+  img.src = cats[Math.floor(Math.random() * cats.length)];
+  img.className = "cat";
+  img.style.left = x + "px";
+  img.style.top = y + "px";
+  document.body.appendChild(img);
+}
+
+// --- 滑鼠點擊產生貓咪 ---
+document.addEventListener("click", (e) => {
+  spawnCat(e.clientX, e.clientY);
+});
+
+// --- 按下空白鍵也會產生貓咪（在畫面中間上方）---
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    spawnCat(window.innerWidth / 2, 50);
+  }
+});
+</script>
 
 </body>
 </html>

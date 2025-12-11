@@ -1,178 +1,126 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>重力貓咪（含牆反彈與碰撞）</title>
+<meta charset="UTF-8">
+<title>Cat Drop Physics</title>
 <style>
-  body { margin:0; overflow:hidden; background:#f7f7fa; }
-  canvas { display:block; }
+    body { margin: 0; overflow: hidden; background: #fafafa; }
+    canvas { display: block; }
 </style>
 </head>
 <body>
-<canvas id="world"></canvas>
+<canvas id="canvas"></canvas>
+
 <script>
-// --- 基本畫布設定 ---
-const canvas = document.getElementById("world");
+const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-// --- 物件 ---
-// 使用圓形近似做碰撞與堆疊
-let cats = [];
+// Cat image (確保一定能載入成功)
+const catImg = new Image();
+catImg.src = "https://i.imgur.com/4AiXzf8.png"; // 小橘貓透明貼圖
 
+const cats = [];
+const gravity = 0.5;
+const bounce = 0.6;
+
+// 產生一隻貓
 function spawnCat(x, y) {
-  const size = 20 + Math.random() * 40; // 半徑
-  cats.push({
-    x: x,
-    y: y,
-    vx: (Math.random()-0.5) * 4,
-    vy: 0,
-    r: size,
-    color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"][Math.floor(Math.random()*4)],
-    grounded: false
-  });
+    const scale = Math.random() * 0.4 + 0.6; // 不同大小
+    cats.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 5,
+        vy: Math.random() * -5,
+        size: 80 * scale
+    });
 }
 
-// --- 繪製單隻貓（簡單卡通） ---
-function drawCat(c) {
-  const s = c.r;
-  // 身體（圓）
-  ctx.fillStyle = c.color;
-  ctx.beginPath();
-  ctx.arc(c.x, c.y, s, 0, Math.PI*2);
-  ctx.fill();
-
-  // 耳朵
-  ctx.fillStyle = c.color;
-  ctx.beginPath();
-  ctx.moveTo(c.x - s*0.6, c.y - s*0.2);
-  ctx.lineTo(c.x - s*0.25, c.y - s*0.9);
-  ctx.lineTo(c.x, c.y - s*0.2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(c.x + s*0.6, c.y - s*0.2);
-  ctx.lineTo(c.x + s*0.25, c.y - s*0.9);
-  ctx.lineTo(c.x, c.y - s*0.2);
-  ctx.fill();
-
-  // 眼睛 & 鼻子
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(c.x - s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
-  ctx.arc(c.x + s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = "pink";
-  ctx.beginPath();
-  ctx.arc(c.x, c.y + s*0.12, s*0.09, 0, Math.PI*2);
-  ctx.fill();
-}
-
-// --- 碰撞工具：圓形碰撞檢查 ---
-function circleOverlap(a, b) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const dist = Math.hypot(dx, dy);
-  return { overlap: dist < (a.r + b.r), dx, dy, dist };
-}
-
-// --- 主更新循環（含重力、牆面反彈、貓貓碰撞、堆疊） ---
-function update() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const gravity = 0.45;
-  const floorY = canvas.height;
-
-  // 先逐一更新速度與位置（受重力）
-  for (let c of cats) {
-    if (!c.grounded) c.vy += gravity;
-    c.x += c.vx;
-    c.y += c.vy;
-  }
-
-  // 邊界處理：左右牆反彈，不會滾出螢幕
-  for (let c of cats) {
-    // 左邊
-    if (c.x - c.r < 0) {
-      c.x = c.r;
-      c.vx = -c.vx * 0.6; // 反彈並衰減
-    }
-    // 右邊
-    if (c.x + c.r > canvas.width) {
-      c.x = canvas.width - c.r;
-      c.vx = -c.vx * 0.6;
-    }
-  }
-
-  // 簡單的 pairwise 碰撞處理（推開彼此並調整垂直）
-  for (let i = 0; i < cats.length; i++) {
-    for (let j = i+1; j < cats.length; j++) {
-      const a = cats[i];
-      const b = cats[j];
-      const info = circleOverlap(a,b);
-      if (info.overlap && info.dist > 0.0001) {
-        // 分離向量 (法向)
-        const overlapAmt = (a.r + b.r) - info.dist;
-        const nx = info.dx / info.dist;
-        const ny = info.dy / info.dist;
-        // 把兩個物體分開（各退一半）
-        a.x -= nx * overlapAmt * 0.5;
-        a.y -= ny * overlapAmt * 0.5;
-        b.x += nx * overlapAmt * 0.5;
-        b.y += ny * overlapAmt * 0.5;
-
-        // 交換部分速度（簡單的彈性碰撞近似）
-        const k = 0.8; // 能量損失
-        const relvx = b.vx - a.vx;
-        const relvy = b.vy - a.vy;
-        const vn = relvx * nx + relvy * ny;
-        if (vn < 0) {
-          const impulse = (-(1 + k) * vn) / 2;
-          a.vx -= impulse * nx;
-          a.vy -= impulse * ny;
-          b.vx += impulse * nx;
-          b.vy += impulse * ny;
-        }
-      }
-    }
-  }
-
-  // 地板碰撞與堆疊（將 touching floor 的物件標為 grounded）
-  for (let c of cats) {
-    if (c.y + c.r > floorY) {
-      c.y = floorY - c.r;
-      // 若速度很小就停止垂直方向
-      if (Math.abs(c.vy) < 1) {
-        c.vy = 0;
-        c.grounded = true;
-      } else {
-        c.vy *= -0.45; // 彈回並衰減
-      }
-      // 摩擦：若在地面減緩水平速度
-      c.vx *= 0.98;
-      // 若速度非常小就停止
-      if (Math.abs(c.vx) < 0.05) c.vx = 0;
-    }
-  }
-
-  // 畫出每隻貓
-  for (let c of cats) drawCat(c);
-
-  requestAnimationFrame(update);
-}
-
-update();
-
-// 點擊生成貓咪
-document.addEventListener("click", (e) => {
-  spawnCat(e.clientX, e.clientY);
+// 滑鼠點擊產生貓
+canvas.addEventListener("mousedown", (e) => {
+    spawnCat(e.clientX, e.clientY);
 });
+
+// 按空白鍵產生貓
+window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+        spawnCat(canvas.width / 2, 50); // 從中上方掉
+    }
+});
+
+function update() {
+    for (let i = 0; i < cats.length; i++) {
+        const c = cats[i];
+
+        // 重力
+        c.vy += gravity;
+        c.x += c.vx;
+        c.y += c.vy;
+
+        // 撞牆
+        if (c.x < 0) {
+            c.x = 0;
+            c.vx *= -bounce;
+        }
+        if (c.x + c.size > canvas.width) {
+            c.x = canvas.width - c.size;
+            c.vx *= -bounce;
+        }
+
+        // 撞地板
+        if (c.y + c.size > canvas.height) {
+            c.y = canvas.height - c.size;
+            c.vy *= -bounce;
+
+            // 速度太小就停止彈跳
+            if (Math.abs(c.vy) < 1) c.vy = 0;
+        }
+
+        // 貓與貓互相碰撞
+        for (let j = i + 1; j < cats.length; j++) {
+            const c2 = cats[j];
+            const dx = (c.x + c.size / 2) - (c2.x + c2.size / 2);
+            const dy = (c.y + c.size / 2) - (c2.y + c2.size / 2);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = (c.size + c2.size) / 2;
+
+            if (dist < minDist) {
+                // 簡單互相彈開
+                const angle = Math.atan2(dy, dx);
+                const overlap = minDist - dist;
+
+                c.x += Math.cos(angle) * overlap / 2;
+                c.y += Math.sin(angle) * overlap / 2;
+                c2.x -= Math.cos(angle) * overlap / 2;
+                c2.y -= Math.sin(angle) * overlap / 2;
+
+                // 交換速度（簡化物理）
+                let tempVx = c.vx;
+                let tempVy = c.vy;
+                c.vx = c2.vx * bounce;
+                c.vy = c2.vy * bounce;
+                c2.vx = tempVx * bounce;
+                c2.vy = tempVy * bounce;
+            }
+        }
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const c of cats) {
+        ctx.drawImage(catImg, c.x, c.y, c.size, c.size);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+catImg.onload = loop;
 </script>
 </body>
 </html>

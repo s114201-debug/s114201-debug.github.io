@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>點一下會出現貓咪</title>
+<title>貓咪出現測試</title>
 <style>
   body {
     margin: 0;
@@ -10,7 +10,6 @@
     height: 100vh;
     overflow: hidden;
     cursor: pointer;
-    font-family: sans-serif;
   }
   .cat {
     position: absolute;
@@ -24,38 +23,16 @@
 <body>
 
 <script>
-// --- 3 款簡單可愛的 SVG 貓 ---
+// --- 3 隻真正 PNG（base64）貓咪 ---
 const cats = [
-  // 橘色圓貓
-  "data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
-    <circle cx='75' cy='75' r='55' fill='#ffb347' />\
-    <circle cx='55' cy='65' r='12' fill='white' />\
-    <circle cx='95' cy='65' r='12' fill='white' />\
-    <circle cx='55' cy='65' r='6' fill='black' />\
-    <circle cx='95' cy='65' r='6' fill='black' />\
-    <polygon points='75,90 63,105 87,105' fill='pink' />\
-  </svg>",
+  // 橘貓 PNG（base64）
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAh0lEQVR4Ae3WsQ2AIBAEwTnpxmASZgEtoCWkAaWgkBDJPUPKMKp3eJ1P9uUFAAAAAAAAAAAAAPAHsp1p8wFNjDZ7FQwE0YBNUjDPVh+EhvRNJwbgo5JPKf9Y3L/Pt+lxXTxmMokYyAAAAAAAAAAAAAGC/A7MJqem0MVZSAAAAAElFTkSuQmCC",
 
-  // 白色貓
-  "data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
-    <ellipse cx='75' cy='85' rx='50' ry='40' fill='white' stroke='#ccc' stroke-width='3' />\
-    <circle cx='55' cy='70' r='10' fill='black' />\
-    <circle cx='95' cy='70' r='10' fill='black' />\
-    <polygon points='75,85 65,95 85,95' fill='pink' />\
-  </svg>",
+  // 灰貓 PNG（base64）
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAjklEQVR4Ae3WsQ2AIBAE4bnpxmASZgEsYCWkAaWgkBDJPWNKMKp3eJ1P9uUFAAAAAAAAAAAAAPAHsp2p8wFNjDZ7FQwE0YBNUjDPVh+EhvRNJwbgo5JPKf9Y3L/Pt+lxXTxmMokYyAAAAAAAAAAAAAGC/A9Chqem0aS9AAAAAElFTkSuQmCC",
 
-  // 紫色方貓
-  "data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'>\
-    <rect x='25' y='25' width='100' height='100' rx='30' fill='#d7b2ff' />\
-    <circle cx='55' cy='65' r='10' fill='white' />\
-    <circle cx='95' cy='65' r='10' fill='white' />\
-    <circle cx='55' cy='65' r='5' fill='black' />\
-    <circle cx='95' cy='65' r='5' fill='black' />\
-    <polygon points='75,85 65,100 85,100' fill='pink' />\
-  </svg>"
+  // 紫貓 PNG（base64）
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAgklEQVR4Ae3WsQ2AIBAE4bnpxmASZgEsYCWkAaWgkBDJPWNKMKp3eJ1P9uUFAAAAAAAAAAAAAPAHsp2p8wFNjDZ7FQwE0YBNUjDPVh+EhvRNJwbgo5JPKf9Y3L/Pt+lxXTxmMokYyAAAAAAAAAAAAAGC/A1Jjqem0CLYAAAAASUVORK5CYII="
 ];
 
 // --- 建立貓咪 ---
@@ -68,15 +45,15 @@ function spawnCat(x, y) {
   document.body.appendChild(img);
 }
 
-// --- 滑鼠點擊產生貓咪 ---
+// --- 滑鼠點擊 ---
 document.addEventListener("click", (e) => {
   spawnCat(e.clientX, e.clientY);
 });
 
-// --- 按下空白鍵也會產生貓咪（在畫面中間上方）---
+// --- 空白鍵 ---
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
-    spawnCat(window.innerWidth / 2, 50);
+    spawnCat(window.innerWidth / 2, 80);
   }
 });
 </script>

@@ -2,46 +2,44 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>超簡易版：一定會出現貓咪</title>
+<title>卯咪來囉</title>
 <style>
 body {
-  margin: 0;
-  height: 100vh;
-  cursor: pointer;
-  background: #f7f7fa;
-  font-family: sans-serif;
+    margin: 0;
+    height: 100vh;
+    cursor: pointer;
+    background: #f7f7fa;
+    font-family: sans-serif;
 }
 .cat {
-  position: absolute;
-  width: 100px;
-  transform: translate(-50%, -50%);
-  user-select: none;
-  pointer-events: none;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    user-select: none;
+    pointer-events: none;
+    border-radius: 10px;
 }
 </style>
 </head>
 <body>
 
 <script>
-const cats = [
-  // 橘貓
-  "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='60' cy='60' r='50' fill='orange'/%3E%3Ccircle cx='40' cy='50' r='12' fill='white'/%3E%3Ccircle cx='80' cy='50' r='12' fill='white'/%3E%3Ccircle cx='40' cy='50' r='6' fill='black'/%3E%3Ccircle cx='80' cy='50' r='6' fill='black'/%3E%3Cpolygon points='60,70 48,85 72,85' fill='pink'/%3E%3C/svg%3E",
+document.addEventListener("click", async (e) => {
+    const img = document.createElement("img");
 
-  // 灰貓
-  "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='60' cy='60' r='50' fill='gray'/%3E%3Ccircle cx='45' cy='55' r='10' fill='white'/%3E%3Ccircle cx='75' cy='55' r='10' fill='white'/%3E%3Ccircle cx='45' cy='55' r='5' fill='black'/%3E%3Ccircle cx='75' cy='55' r='5' fill='black'/%3E%3Cpolygon points='60,75 50,90 70,90' fill='pink'/%3E%3C/svg%3E",
+    // 隨機大小：80px ~ 200px
+    const size = Math.floor(Math.random() * 120) + 80;
 
-  // 紫色方塊貓
-  "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect x='20' y='20' width='80' height='80' rx='20' fill='%23c98aff'/%3E%3Ccircle cx='45' cy='55' r='10' fill='white'/%3E%3Ccircle cx='75' cy='55' r='10' fill='white'/%3E%3Ccircle cx='45' cy='55' r='5' fill='black'/%3E%3Ccircle cx='75' cy='55' r='5' fill='black'/%3E%3Cpolygon points='60,75 50,90 70,90' fill='pink'/%3E%3C/svg%3E"
-];
+    img.className = "cat";
+    img.style.width = size + "px";
+    img.style.left = e.clientX + "px";
+    img.style.top = e.clientY + "px";
 
-document.addEventListener("click", (e) => {
-  const img = document.createElement("img");
-  const randomCat = cats[Math.floor(Math.random() * cats.length)];
-  img.src = randomCat;
-  img.className = "cat";
-  img.style.left = e.clientX + "px";
-  img.style.top = e.clientY + "px";
-  document.body.appendChild(img);
+    // 取得隨機可愛貓咪圖片
+    const res = await fetch("https://api.thecatapi.com/v1/images/search");
+    const data = await res.json();
+    img.src = data[0].url;
+
+    document.body.appendChild(img);
 });
 </script>
 

@@ -2,11 +2,16 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>重力貓咪（含牆反彈與碰撞）</title>
+<title>重力貓咪</title>
 <style>
-  body { margin: 0; overflow: hidden; background: #f7f7fa; }
-  canvas { display: block; }
-
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #f7f7fa;
+  }
+  canvas {
+    display: block;
+  }
   #hint {
     position: fixed;
     top: 50%;
@@ -29,7 +34,9 @@
 const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
 const hint = document.getElementById("hint");
-let firstClick = true;
+
+let firstAction = true;
+let cats = [];
 
 function resize() {
   canvas.width = window.innerWidth;
@@ -37,8 +44,6 @@ function resize() {
 }
 window.addEventListener("resize", resize);
 resize();
-
-let cats = [];
 
 function spawnCat(x, y) {
   const r = 20 + Math.random() * 40;
@@ -48,8 +53,7 @@ function spawnCat(x, y) {
     vy: 0,
     r,
     color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"]
-      [Math.floor(Math.random() * 4)],
-    grounded: false
+      [Math.floor(Math.random() * 4)]
   });
 }
 
@@ -88,12 +92,43 @@ function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const gravity = 0.45;
 
+  // 移動
   for (let c of cats) {
-    if (!c.grounded) c.vy += gravity;
+    c.vy += gravity;
     c.x += c.vx;
     c.y += c.vy;
+  }
 
-    if (c.x - c.r < 0 || c.x + c.r > canvas.width) {
+  // 球與球碰撞
+  for (let i = 0; i < cats.length; i++) {
+    for (let j = i + 1; j < cats.length; j++) {
+      const a = cats[i];
+      const b = cats[j];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = a.r + b.r;
+
+      if (dist > 0 && dist < minDist) {
+        const overlap = minDist - dist;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        a.x -= nx * overlap * 0.5;
+        a.y -= ny * overlap * 0.5;
+        b.x += nx * overlap * 0.5;
+        b.y += ny * overlap * 0.5;
+      }
+    }
+  }
+
+  // 牆壁 & 地板
+  for (let c of cats) {
+    if (c.x - c.r < 0) {
+      c.x = c.r;
+      c.vx *= -0.6;
+    }
+    if (c.x + c.r > canvas.width) {
+      c.x = canvas.width - c.r;
       c.vx *= -0.6;
     }
     if (c.y + c.r > canvas.height) {
@@ -101,7 +136,6 @@ function update() {
       c.vy = Math.abs(c.vy) < 1 ? 0 : -c.vy * 0.45;
       c.vx *= 0.98;
     }
-
     drawCat(c);
   }
 
@@ -109,26 +143,27 @@ function update() {
 }
 update();
 
-// 滑鼠點擊
-document.addEventListener("click", (e) => {
-  if (firstClick) {
+// 滑鼠
+document.addEventListener("click", e => {
+  if (firstAction) {
     hint.style.display = "none";
-    firstClick = false;
+    firstAction = false;
   }
   spawnCat(e.clientX, e.clientY);
 });
 
 // 空白鍵
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", e => {
   if (e.code === "Space") {
     e.preventDefault();
-    if (firstClick) {
+    if (firstAction) {
       hint.style.display = "none";
-      firstClick = false;
+      firstAction = false;
     }
     spawnCat(canvas.width / 2, 50);
   }
 });
 </script>
+
 </body>
 </html>

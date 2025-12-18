@@ -24,6 +24,7 @@ resize();
 // --- 物件 ---
 // 使用圓形近似做碰撞與堆疊
 let cats = [];
+  let showHint = true;
 
 function spawnCat(x, y) {
   const size = 20 + Math.random() * 40; // 半徑
@@ -163,6 +164,14 @@ function update() {
 
   // 畫出每隻貓
   for (let c of cats) drawCat(c);
+// 中央提示文字
+if (showHint) {
+  ctx.fillStyle = "#666";
+  ctx.font = "48px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("點一下", canvas.width / 2, canvas.height / 2);
+}
 
   requestAnimationFrame(update);
 }
@@ -171,8 +180,17 @@ update();
 
 // 點擊生成貓咪
 document.addEventListener("click", (e) => {
+  showHint = false;
   spawnCat(e.clientX, e.clientY);
 });
+  window.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.code === "Space") {
+    e.preventDefault();
+    showHint = false;
+    spawnCat(canvas.width / 2, 50);
+  }
+});
+
 </script>
 </body>
 </html>

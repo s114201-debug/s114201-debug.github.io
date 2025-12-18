@@ -4,16 +4,9 @@
 <meta charset="utf-8" />
 <title>重力貓咪（含牆反彈與碰撞）</title>
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background: #f7f7fa;
-  }
-  canvas {
-    display: block;
-  }
+  body { margin: 0; overflow: hidden; background: #f7f7fa; }
+  canvas { display: block; }
 
-  /* 中央提示文字 */
   #hint {
     position: fixed;
     top: 50%;
@@ -22,7 +15,7 @@
     font-size: 48px;
     font-weight: bold;
     color: #666;
-    pointer-events: none; /* 不擋點擊 */
+    pointer-events: none;
     user-select: none;
   }
 </style>
@@ -33,37 +26,33 @@
 <canvas id="world"></canvas>
 
 <script>
-// --- 基本畫布設定 ---
 const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
+const hint = document.getElementById("hint");
+let firstClick = true;
+
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener('resize', resize);
+window.addEventListener("resize", resize);
 resize();
 
-// --- 提示文字控制 ---
-const hint = document.getElementById("hint");
-let firstClick = true;
-
-// --- 物件 ---
 let cats = [];
 
 function spawnCat(x, y) {
-  const size = 20 + Math.random() * 40;
+  const r = 20 + Math.random() * 40;
   cats.push({
     x, y,
     vx: (Math.random() - 0.5) * 4,
     vy: 0,
-    r: size,
+    r,
     color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"]
       [Math.floor(Math.random() * 4)],
     grounded: false
   });
 }
 
-// --- 繪製貓咪 ---
 function drawCat(c) {
   const s = c.r;
   ctx.fillStyle = c.color;
@@ -71,7 +60,6 @@ function drawCat(c) {
   ctx.arc(c.x, c.y, s, 0, Math.PI * 2);
   ctx.fill();
 
-  // 耳朵
   ctx.beginPath();
   ctx.moveTo(c.x - s*0.6, c.y - s*0.2);
   ctx.lineTo(c.x - s*0.25, c.y - s*0.9);
@@ -84,90 +72,62 @@ function drawCat(c) {
   ctx.lineTo(c.x, c.y - s*0.2);
   ctx.fill();
 
-  // 眼睛
   ctx.fillStyle = "#000";
   ctx.beginPath();
   ctx.arc(c.x - s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
   ctx.arc(c.x + s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
   ctx.fill();
 
-  // 鼻子
   ctx.fillStyle = "pink";
   ctx.beginPath();
   ctx.arc(c.x, c.y + s*0.12, s*0.09, 0, Math.PI*2);
   ctx.fill();
 }
 
-// --- 碰撞 ---
-function circleOverlap(a, b) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const dist = Math.hypot(dx, dy);
-  return { overlap: dist < (a.r + b.r), dx, dy, dist };
-}
-
-// --- 更新 ---
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const gravity = 0.45;
-  const floorY = canvas.height;
 
   for (let c of cats) {
     if (!c.grounded) c.vy += gravity;
     c.x += c.vx;
     c.y += c.vy;
-  }
 
-  // 牆壁
-  for (let c of cats) {
-    if (c.x - c.r < 0) {
-      c.x = c.r;
+    if (c.x - c.r < 0 || c.x + c.r > canvas.width) {
       c.vx *= -0.6;
     }
-    if (c.x + c.r > canvas.width) {
-      c.x = canvas.width - c.r;
-      c.vx *= -0.6;
-    }
-  }
-
-  // 貓貓碰撞
-  for (let i = 0; i < cats.length; i++) {
-    for (let j = i + 1; j < cats.length; j++) {
-      const a = cats[i], b = cats[j];
-      const info = circleOverlap(a, b);
-      if (info.overlap && info.dist > 0.0001) {
-        const overlap = (a.r + b.r) - info.dist;
-        const nx = info.dx / info.dist;
-        const ny = info.dy / info.dist;
-        a.x -= nx * overlap * 0.5;
-        a.y -= ny * overlap * 0.5;
-        b.x += nx * overlap * 0.5;
-        b.y += ny * overlap * 0.5;
-      }
-    }
-  }
-
-  // 地板
-  for (let c of cats) {
-    if (c.y + c.r > floorY) {
-      c.y = floorY - c.r;
+    if (c.y + c.r > canvas.height) {
+      c.y = canvas.height - c.r;
       c.vy = Math.abs(c.vy) < 1 ? 0 : -c.vy * 0.45;
       c.vx *= 0.98;
     }
+
+    drawCat(c);
   }
 
-  for (let c of cats) drawCat(c);
   requestAnimationFrame(update);
 }
 update();
 
-// --- 點擊 ---
+// 滑鼠點擊
 document.addEventListener("click", (e) => {
   if (firstClick) {
     hint.style.display = "none";
     firstClick = false;
   }
   spawnCat(e.clientX, e.clientY);
+});
+
+// 空白鍵
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    if (firstClick) {
+      hint.style.display = "none";
+      firstClick = false;
+    }
+    spawnCat(canvas.width / 2, 50);
+  }
 });
 </script>
 </body>

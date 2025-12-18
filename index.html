@@ -2,14 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>重力貓咪（彈性碰撞版）</title>
+<title>重力貓咪（會彈飛）</title>
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background: #f7f7fa;
-  }
-  canvas { display: block; }
+  body { margin:0; overflow:hidden; background:#f7f7fa; }
+  canvas { display:block; }
   #hint {
     position: fixed;
     top: 50%;
@@ -47,7 +43,7 @@ function spawnCat(x, y) {
   const r = 20 + Math.random() * 40;
   cats.push({
     x, y,
-    vx: (Math.random() - 0.5) * 4,
+    vx: (Math.random() - 0.5) * 6,
     vy: 0,
     r,
     color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"]
@@ -56,134 +52,11 @@ function spawnCat(x, y) {
 }
 
 function drawCat(c) {
-  const s = c.r;
   ctx.fillStyle = c.color;
   ctx.beginPath();
-  ctx.arc(c.x, c.y, s, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(c.x - s*0.6, c.y - s*0.2);
-  ctx.lineTo(c.x - s*0.25, c.y - s*0.9);
-  ctx.lineTo(c.x, c.y - s*0.2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(c.x + s*0.6, c.y - s*0.2);
-  ctx.lineTo(c.x + s*0.25, c.y - s*0.9);
-  ctx.lineTo(c.x, c.y - s*0.2);
-  ctx.fill();
-
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(c.x - s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
-  ctx.arc(c.x + s*0.28, c.y - s*0.08, s*0.12, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = "pink";
-  ctx.beginPath();
-  ctx.arc(c.x, c.y + s*0.12, s*0.09, 0, Math.PI*2);
+  ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
   ctx.fill();
 }
 
-function update() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const gravity = 0.45;
-  const restitution = 0.8; // 彈性係數（越大越彈）
-
-  // 移動 + 重力
-  for (let c of cats) {
-    c.vy += gravity;
-    c.x += c.vx;
-    c.y += c.vy;
-  }
-
-  // 球與球彈性碰撞
-  for (let i = 0; i < cats.length; i++) {
-    for (let j = i + 1; j < cats.length; j++) {
-      const a = cats[i];
-      const b = cats[j];
-
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const dist = Math.hypot(dx, dy);
-      const minDist = a.r + b.r;
-
-      if (dist > 0 && dist < minDist) {
-        const nx = dx / dist;
-        const ny = dy / dist;
-
-        // --- 位置分離（避免重疊） ---
-        const overlap = minDist - dist;
-        a.x -= nx * overlap * 0.5;
-        a.y -= ny * overlap * 0.5;
-        b.x += nx * overlap * 0.5;
-        b.y += ny * overlap * 0.5;
-
-        // --- 速度衝量（彈飛關鍵） ---
-        const rvx = b.vx - a.vx;
-        const rvy = b.vy - a.vy;
-        const vn = rvx * nx + rvy * ny;
-
-        if (vn < 0) {
-          const impulse = -(1 + restitution) * vn / 2;
-          const ix = impulse * nx;
-          const iy = impulse * ny;
-
-          a.vx -= ix;
-          a.vy -= iy;
-          b.vx += ix;
-          b.vy += iy;
-        }
-      }
-    }
-  }
-
-  // 牆壁 & 地板
-  for (let c of cats) {
-    if (c.x - c.r < 0) {
-      c.x = c.r;
-      c.vx *= -0.6;
-    }
-    if (c.x + c.r > canvas.width) {
-      c.x = canvas.width - c.r;
-      c.vx *= -0.6;
-    }
-    if (c.y + c.r > canvas.height) {
-      c.y = canvas.height - c.r;
-      c.vy *= -0.45;
-      c.vx *= 0.98;
-      if (Math.abs(c.vy) < 1) c.vy = 0;
-    }
-    drawCat(c);
-  }
-
-  requestAnimationFrame(update);
-}
-update();
-
-// 點擊
-document.addEventListener("click", e => {
-  if (firstAction) {
-    hint.style.display = "none";
-    firstAction = false;
-  }
-  spawnCat(e.clientX, e.clientY);
-});
-
-// 空白鍵
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    if (firstAction) {
-      hint.style.display = "none";
-      firstAction = false;
-    }
-    spawnCat(canvas.width / 2, 40);
-  }
-});
-</script>
-
-</body>
-</html>
+/* ===== 核心：真的會彈的物理 ===== */
+function updat

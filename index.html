@@ -2,16 +2,14 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>重力貓咪</title>
+<title>重力貓咪（彈性碰撞版）</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
     background: #f7f7fa;
   }
-  canvas {
-    display: block;
-  }
+  canvas { display: block; }
   #hint {
     position: fixed;
     top: 50%;
@@ -90,33 +88,54 @@ function drawCat(c) {
 
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const gravity = 0.45;
 
-  // 移動
+  const gravity = 0.45;
+  const restitution = 0.8; // 彈性係數（越大越彈）
+
+  // 移動 + 重力
   for (let c of cats) {
     c.vy += gravity;
     c.x += c.vx;
     c.y += c.vy;
   }
 
-  // 球與球碰撞
+  // 球與球彈性碰撞
   for (let i = 0; i < cats.length; i++) {
     for (let j = i + 1; j < cats.length; j++) {
       const a = cats[i];
       const b = cats[j];
+
       const dx = b.x - a.x;
       const dy = b.y - a.y;
       const dist = Math.hypot(dx, dy);
       const minDist = a.r + b.r;
 
       if (dist > 0 && dist < minDist) {
-        const overlap = minDist - dist;
         const nx = dx / dist;
         const ny = dy / dist;
+
+        // --- 位置分離（避免重疊） ---
+        const overlap = minDist - dist;
         a.x -= nx * overlap * 0.5;
         a.y -= ny * overlap * 0.5;
         b.x += nx * overlap * 0.5;
         b.y += ny * overlap * 0.5;
+
+        // --- 速度衝量（彈飛關鍵） ---
+        const rvx = b.vx - a.vx;
+        const rvy = b.vy - a.vy;
+        const vn = rvx * nx + rvy * ny;
+
+        if (vn < 0) {
+          const impulse = -(1 + restitution) * vn / 2;
+          const ix = impulse * nx;
+          const iy = impulse * ny;
+
+          a.vx -= ix;
+          a.vy -= iy;
+          b.vx += ix;
+          b.vy += iy;
+        }
       }
     }
   }
@@ -133,8 +152,9 @@ function update() {
     }
     if (c.y + c.r > canvas.height) {
       c.y = canvas.height - c.r;
-      c.vy = Math.abs(c.vy) < 1 ? 0 : -c.vy * 0.45;
+      c.vy *= -0.45;
       c.vx *= 0.98;
+      if (Math.abs(c.vy) < 1) c.vy = 0;
     }
     drawCat(c);
   }
@@ -143,7 +163,7 @@ function update() {
 }
 update();
 
-// 滑鼠
+// 點擊
 document.addEventListener("click", e => {
   if (firstAction) {
     hint.style.display = "none";
@@ -160,7 +180,7 @@ document.addEventListener("keydown", e => {
       hint.style.display = "none";
       firstAction = false;
     }
-    spawnCat(canvas.width / 2, 50);
+    spawnCat(canvas.width / 2, 40);
   }
 });
 </script>

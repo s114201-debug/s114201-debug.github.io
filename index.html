@@ -2,10 +2,14 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<title>重力貓咪（會彈飛）</title>
+<title>重力貓咪（穩定彈飛版）</title>
 <style>
-  body { margin:0; overflow:hidden; background:#f7f7fa; }
-  canvas { display:block; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #f7f7fa;
+  }
+  canvas { display: block; }
   #hint {
     position: fixed;
     top: 50%;
@@ -29,34 +33,128 @@ const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
 const hint = document.getElementById("hint");
 
-let firstAction = true;
 let cats = [];
+let firstAction = true;
 
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener("resize", resize);
 resize();
+window.addEventListener("resize", resize);
 
 function spawnCat(x, y) {
-  const r = 20 + Math.random() * 40;
   cats.push({
-    x, y,
-    vx: (Math.random() - 0.5) * 6,
-    vy: 0,
-    r,
-    color: ["#ffcc66","#d1d1d1","#c98aff","#ffa07a"]
-      [Math.floor(Math.random() * 4)]
+    x,
+    y,
+    vx: (Math.random() - 0.5) * 4,
+    vy: -2,
+    r: 25
   });
 }
 
 function drawCat(c) {
-  ctx.fillStyle = c.color;
+  ctx.fillStyle = "#ffa07a";
   ctx.beginPath();
-  ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+  ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
   ctx.fill();
 }
 
-/* ===== 核心：真的會彈的物理 ===== */
-function updat
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const gravity = 0.4;
+  const bounce = 0.8;
+
+  // 移動
+  for (let c of cats) {
+    c.vy += gravity;
+    c.x += c.vx;
+    c.y += c.vy;
+  }
+
+  // 球與球碰撞（一定會彈）
+  for (let i = 0; i < cats.length; i++) {
+    for (let j = i + 1; j < cats.length; j++) {
+      const a = cats[i];
+      const b = cats[j];
+
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = a.r + b.r;
+
+      if (dist > 0 && dist < minDist) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDist - dist;
+
+        // 推開
+        a.x -= nx * overlap * 0.5;
+        a.y -= ny * overlap * 0.5;
+        b.x += nx * overlap * 0.5;
+        b.y += ny * overlap * 0.5;
+
+        // 彈飛
+        const rvx = b.vx - a.vx;
+        const rvy = b.vy - a.vy;
+        const vn = rvx * nx + rvy * ny;
+
+        if (vn < 0) {
+          const impulse = -(1 + bounce) * vn * 0.5;
+          a.vx -= impulse * nx;
+          a.vy -= impulse * ny;
+          b.vx += impulse * nx;
+          b.vy += impulse * ny;
+        }
+      }
+    }
+  }
+
+  // 牆壁與地板
+  for (let c of cats) {
+    if (c.x - c.r < 0) {
+      c.x = c.r;
+      c.vx *= -bounce;
+    }
+    if (c.x + c.r > canvas.width) {
+      c.x = canvas.width - c.r;
+      c.vx *= -bounce;
+    }
+    if (c.y + c.r > canvas.height) {
+      c.y = canvas.height - c.r;
+      c.vy *= -bounce;
+    }
+    drawCat(c);
+  }
+
+  requestAnimationFrame(update);
+}
+update();
+
+/* === 事件（這版一定抓得到） === */
+
+// 滑鼠
+window.addEventListener("click", e => {
+  if (firstAction) {
+    hint.style.display = "none";
+    firstAction = false;
+  }
+  spawnCat(e.clientX, e.clientY);
+});
+
+// 空白鍵
+window.addEventListener("keydown", e => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    if (firstAction) {
+      hint.style.display = "none";
+      firstAction = false;
+    }
+    spawnCat(canvas.width / 2, 50);
+  }
+});
+</script>
+
+</body>
+</html>
